@@ -1,0 +1,342 @@
+# Scorn
+# The city is pretty rectangular so quite easy to define large zones to add to.
+map /world/world_104_115
+population 2
+zone 40 26 50 50
+point 41 39
+point 48 35
+point 49 40
+point 47 22
+point 49 37
+arch c_man
+arch c_woman
+arch child
+arch farmer
+arch fatman
+arch fatwoman
+arch guard
+arch knight
+arch man
+arch nun
+arch sage
+arch woman
+
+map /world/world_105_115
+population 5
+zone 0 26 22 50
+point 15 42
+point 10 34
+point 15 29
+point 1 25
+point 1 29
+arch c_man
+arch c_woman
+arch child
+arch farmer
+arch fatman
+arch fatwoman
+arch guard
+arch knight
+arch man
+arch nun
+arch sage
+arch woman
+
+map /world/world_104_116
+population 5
+zone 41 0 50 10
+point 41 2
+point 46 8
+point 42 8
+arch c_man
+arch c_woman
+arch child
+arch farmer
+arch fatman
+arch fatwoman
+arch guard
+arch knight
+arch man
+arch nun
+arch sage
+arch woman
+
+map /world/world_105_116
+population 5
+zone 0 0 13 10
+point 2 8
+point 11 8
+point 8 1
+point 5 8
+arch c_man
+arch c_woman
+arch child
+arch farmer
+arch fatman
+arch fatwoman
+arch guard
+arch knight
+arch man
+arch nun
+arch sage
+arch woman
+
+# Scorn County
+# Intentionally fall through from world_105_116 definition above,
+# so that both sections actually work.
+population 8
+# Village
+zone 24 27 27 35
+# Field
+zone 25 12 27 18
+# Field
+zone 34 12 36 16
+# Field
+zone 38 0 45 2
+point 24 27
+point 26 27
+point 24 29
+point 27 29
+point 24 31
+point 24 34
+point 34 32
+point 41 1
+arch child
+arch farmer
+arch fatman
+arch fatwoman
+
+# Darcap
+# The city is triangular so we will try 3 rectangles that exclude the inn and docks.
+map /world/world_116_102
+population 4
+zone 19 24 32 33
+zone 19 35 30 44
+zone 31 14 41 25
+point 23 25
+point 19 27
+point 28 25
+point 28 30
+point 26 33
+point 28 35
+point 19 37
+point 25 37
+point 19 43
+point 32 44
+point 25 43
+point 31 16
+point 31 18
+point 31 20
+point 41 16
+point 41 18
+point 41 20
+point 34 17
+point 37 22
+arch c_man
+arch c_woman
+arch child
+arch farmer
+arch fatman
+arch fatwoman
+arch guard
+arch knight
+arch man
+arch nun
+arch sage
+arch woman
+
+# Navar
+# The city is lumpy with some internal walls and divisions so we need a bunch oa zones.
+map /world/world_121_116
+population 2
+zone 38 29 48 35
+zone 36 38 49 44
+zone 39 45 49 49
+zone 36 48 38 49
+point 39 29
+point 41 31
+point 48 29
+point 38 35
+point 43 39
+point 38 46
+point 36 48
+point 45 47
+arch c_man
+arch c_woman
+arch child
+arch elf_man
+arch courier
+arch fatwoman
+arch guard
+arch knight
+arch dwarf_wiz
+arch clown
+arch sage
+arch woman
+arch fighter
+arch halfling
+arch sailor
+
+map /world/world_122_116
+population 5
+zone 0 33 7 49
+zone 10 38 19 44
+zone 11 45 19 49
+point 4 34
+point 2 39
+point 2 45
+point 8 46
+point 13 47
+point 21 42
+arch c_man
+arch c_woman
+arch child
+arch elf_man
+arch courier
+arch fatwoman
+arch guard
+arch knight
+arch dwarf_wiz
+arch clown
+arch sage
+arch woman
+arch fighter
+arch halfling
+arch sailor
+
+map /world/world_121_117
+population 3
+zone 36 0 49 5
+zone 39 6 49 15
+point 42 7
+point 37 4
+point 46 11
+arch c_man
+arch c_woman
+arch child
+arch elf_man
+arch courier
+arch fatwoman
+arch guard
+arch knight
+arch dwarf_wiz
+arch clown
+arch sage
+arch woman
+arch fighter
+arch halfling
+arch sailor
+
+map /world/world_122_117
+population 5
+zone 0 0 8 15
+zone 4 16 13 18
+zone 9 4 18 14
+zone 10 0 18 1
+point 3 0
+point 1 1
+point 3 9
+point 5 16
+point 18 14
+point 12 11
+point 14 4
+point 12 0
+arch c_man
+arch c_woman
+arch child
+arch elf_man
+arch courier
+arch fatwoman
+arch guard
+arch knight
+arch dwarf_wiz
+arch clown
+arch sage
+arch woman
+arch fighter
+arch halfling
+arch sailor
+
+# Port Joseph
+# The city is pretty small so one zone ought to do it.
+map /world/world_101_114
+population 3
+zone 10 27 19 43
+point 14 31
+point 17 32
+point 13 35
+point 17 42
+point 13 38
+point 17 36
+arch c_man
+arch c_woman
+arch pirate
+arch fatman
+arch fatwoman
+arch man
+arch sailor
+arch woman3
+
+# Stoneville
+# The city does not have a wall or small boundries but one zone ought to do it.
+map /world/world_103_127
+population 2
+zone 0 8 14 23
+point 3 9
+point 8 15
+point 1 21
+point 2 17
+point 12 9
+arch c_man
+arch c_woman
+arch pirate
+arch fatman
+arch fatwoman
+arch man
+arch sailor
+arch woman3
+
+# Wolfsburg
+# The city is a big rectangle so one zone ought to do it.
+map /world/world_128_109
+population 4
+zone 13 1 45 17
+point 15 1
+point 19 7
+point 22 10
+point 29 7
+point 42 2
+point 37 6
+point 43 8
+point 33 11
+arch c_man
+arch c_woman
+arch fatman
+arch fatwoman
+arch man
+arch sailor
+arch woman3
+arch merchant
+
+# Santo Dominion
+# The city is a big rectangle so one zone ought to do it.
+map /world/world_102_108
+population 3
+zone 9 14 25 20
+zone 15 6 23 13
+point 15 6
+point 18 5
+point 14 9
+point 15 16
+point 31 15
+point 22 20
+point 11 19
+point 26 11
+arch c_man
+arch c_woman
+arch fatman
+arch fatwoman
+arch man
+arch sailor
+arch woman3
+arch merchant

@@ -23,3 +23,6 @@ jobs:
 
       - name: Run feature tests
         run: python3 tests/test_feature_systems.py
+
+      - name: Run citylife config tests
+        run: python3 tests/test_citylife_config.py

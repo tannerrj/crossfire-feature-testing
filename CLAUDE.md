@@ -22,8 +22,11 @@ lib/                    Crossfire Python modules under test (from crossfire-maps
   CFLog.py              Player login / citylife log (CFDataFile)
   CFMail.py             Postal system (SQLite via CFSqlDb)
   CFSqlDb.py            SQLite connection helper
+fixtures/
+  world.citylife        NPC spawn configuration (from crossfire-maps)
 tests/
-  test_feature_systems.py   Test runner -- 100 checks across all five systems
+  test_feature_systems.py   Python subsystem tests -- 100 checks
+  test_citylife_config.py   NPC spawn config tests -- 52 checks
 .github/workflows/
   ci.yml                GitHub Actions: Python 3.8 through 3.12
 ```

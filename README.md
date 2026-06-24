@@ -11,15 +11,16 @@ a temporary on-disk database, then cleans up after itself.
 
 ## What Is Tested
 
-| System | Module | Coverage |
+| System | Module / File | Coverage |
 |---|---|---|
 | Banking | `CFBank` | deposit, accumulation, withdrawal, overdraft rejection, multiple accounts, account removal |
 | Postal | `CFMail` | send types 1/2/3, count, receive empties queue, message body, empty-mailbox receive |
 | Message Boards | `CFBoard` | write, list, getauthor, delete by id, invalid delete, independent board namespaces |
 | Citylife / Player Log | `CFLog` | create, login count, IP tracking, kick and muzzle counters and dates, remove, timestamp parse |
 | Guild System | `CFGuilds` | guild registry (add, establish, points, quest points, status), member CRUD, full rank ladder, rank floor/ceiling, demerits cap, dues updating guild points, SearchGuilds |
+| Citylife NPC config | `fixtures/world.citylife` | parse correctness, required fields, zone/point bounds, archetype names, Scorn and Navar coverage, Scorn County fall-through |
 
-100 checks across all five subsystems.
+100 checks across the five Python subsystems; 52 checks for the citylife NPC configuration.
 
 ## Requirements
 
@@ -49,10 +50,13 @@ crossfire-feature-testing/
 │   ├── CFLog.py            Player login/citylife log
 │   ├── CFMail.py           Postal system
 │   └── CFSqlDb.py          SQLite database helper
+├── fixtures/
+│   └── world.citylife          NPC spawn config (from crossfire-maps)
 ├── patches/
 │   └── cfdatafile-putdata-fix.patch    Upstream bug fix patch
 ├── tests/
-│   └── test_feature_systems.py         Test runner and all checks
+│   ├── test_feature_systems.py         Python subsystem tests (100 checks)
+│   └── test_citylife_config.py         NPC spawn config tests (52 checks)
 ├── .github/
 │   └── workflows/
 │       └── ci.yml          GitHub Actions: runs tests on Python 3.8 through 3.12
