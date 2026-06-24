@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Shelve database files (CFBoard runtime storage)
+*.db
+*.dir
+*.bak
+*.dat
+
+# SQLite database files (CFBank, CFMail runtime storage)
+*.sqlite
+*.sqlite3
+
+# CFDataFile flat-file storage directory
+datafiles/
+
+# Temporary test output
+cf_test_*/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Claude Code user-local settings (.claude/settings.json is tracked)
+.claude/settings.local.json
+
+# Editor and OS
+.DS_Store
+*~
+*.swp
+*.swo

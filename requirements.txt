@@ -1,0 +1,9 @@
+# No third-party packages are required.
+# All dependencies are part of the Python standard library:
+#
+#   os, sys, tempfile, shutil, traceback  -- test harness infrastructure
+#   sqlite3                               -- CFBank, CFMail (via CFSqlDb)
+#   shelve                                -- CFBoard
+#   time                                  -- CFLog, CFGuilds
+#
+# Python 3.8 or later is required.
