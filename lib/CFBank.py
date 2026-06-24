@@ -16,8 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# The author can be reached via e-mail at jbontje@suespammers.org
-#
 # This module stores bank account information.
 
 import Crossfire
