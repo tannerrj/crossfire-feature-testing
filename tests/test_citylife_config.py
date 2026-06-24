@@ -143,6 +143,17 @@ MAP_SIZE = 50
 FIXTURES_DIR  = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'fixtures')
 CITYLIFE_FILE = os.path.join(FIXTURES_DIR, 'world.citylife')
 
+# Paths to sibling Crossfire repositories used by the source-level checks.
+# Expected layout:  <parent>/crossfire-crossfire-arch/
+#                   <parent>/crossfire-crossfire-server/
+#                   <parent>/crossfire-feature-testing/   ← this project
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_cf_root      = os.path.dirname(_project_root)
+ARCH_DIR      = os.path.join(_cf_root, 'crossfire-crossfire-arch')
+SERVER_DIR    = os.path.join(_cf_root, 'crossfire-crossfire-server')
+INIT_CPP      = os.path.join(SERVER_DIR, 'server', 'init.cpp')
+CITYLIFE_CPP  = os.path.join(SERVER_DIR, 'server', 'modules', 'citylife.cpp')
+
 try:
     # -----------------------------------------------------------------------
     # File and parser
@@ -350,6 +361,127 @@ try:
           '/world/world_102_108' in maps)
     check('Santo Dominion includes merchant archetype',
           'merchant' in maps.get('/world/world_102_108', {}).get('archetypes', []))
+
+    # -----------------------------------------------------------------------
+    # Archetype cross-reference (Bug 2 prevention)
+    #
+    # get_npc() calls try_find_archetype() and return NULL when a name is not
+    # in the server's loaded arch set.  add_npc_to_point() dereferences that
+    # NULL without a guard -- a crash.  Verify every arch name in
+    # world.citylife exists in the crossfire-arch library so that get_npc()
+    # will never return NULL for this config.
+    # -----------------------------------------------------------------------
+    section('Archetype cross-reference (Bug 2: crash on unknown archetype)')
+
+    if not os.path.isdir(ARCH_DIR):
+        print('  SKIP  arch library not found at %s' % ARCH_DIR)
+    else:
+        known_archs = set()
+        for dirpath, _dirs, files in os.walk(ARCH_DIR):
+            for fname in files:
+                if fname.endswith('.arc'):
+                    with open(os.path.join(dirpath, fname), 'r', errors='replace') as fh:
+                        for line in fh:
+                            if line.startswith('Object '):
+                                known_archs.add(line[7:].strip())
+
+        check('arch library loaded (%d archetypes found)' % len(known_archs),
+              len(known_archs) > 0)
+
+        citylife_archs = sorted(set(a for m in maps.values() for a in m['archetypes']))
+        missing = [a for a in citylife_archs if a not in known_archs]
+
+        check('all %d unique archetypes in world.citylife exist in the arch library'
+              % len(citylife_archs),
+              len(missing) == 0)
+        for a in missing:
+            print('    unknown archetype: %s' % a)
+
+    # -----------------------------------------------------------------------
+    # Server init order (Bug 1: init_modules must precede init_library)
+    #
+    # citylife_init() registers the .citylife asset collector hook.
+    # assets_add_collector_hook() must be called before load_assets() runs
+    # (inside init_library()), otherwise the hook fires too late and no zone
+    # data is ever parsed -- citylife silently becomes a no-op.
+    # -----------------------------------------------------------------------
+    section('Server init order (Bug 1: init_modules before init_library)')
+
+    if not os.path.isfile(INIT_CPP):
+        print('  SKIP  server/init.cpp not found at %s' % INIT_CPP)
+    else:
+        with open(INIT_CPP) as fh:
+            init_lines = fh.readlines()
+
+        # Match indented function calls only -- skips definitions and declarations.
+        _call_re  = lambda name: re.compile(r'^\s+' + re.escape(name) + r'\s*\([^)]*\)\s*;')
+        _modules_re = _call_re('init_modules')
+        _library_re = _call_re('init_library')
+
+        modules_lines = [i + 1 for i, l in enumerate(init_lines) if _modules_re.match(l)]
+        library_lines = [i + 1 for i, l in enumerate(init_lines) if _library_re.match(l)]
+
+        check('init_modules() call found in server/init.cpp',
+              len(modules_lines) > 0)
+        check('init_library() call found in server/init.cpp',
+              len(library_lines) > 0)
+
+        if modules_lines and library_lines:
+            ml = modules_lines[0]
+            ll = library_lines[0]
+            check('init_modules() (line %d) is called before init_library() (line %d) '
+                  '-- if reversed, citylife hook is registered too late and no NPCs spawn'
+                  % (ml, ll),
+                  ml < ll)
+
+    # -----------------------------------------------------------------------
+    # Null guard in add_npc_to_point (Bug 2: latent crash)
+    #
+    # add_npc_to_zone() correctly checks get_npc() for NULL before use.
+    # add_npc_to_point() does not, so a NULL return (bad archetype name)
+    # causes a crash on every ~40th EVENT_CLOCK tick once citylife is active.
+    # -----------------------------------------------------------------------
+    section('Null guard in add_npc_to_point (Bug 2: latent null dereference)')
+
+    if not os.path.isfile(CITYLIFE_CPP):
+        print('  SKIP  server/modules/citylife.cpp not found at %s' % CITYLIFE_CPP)
+    else:
+        with open(CITYLIFE_CPP) as fh:
+            cpp_lines = fh.readlines()
+
+        # Extract the body of add_npc_to_point by scanning from its opening
+        # brace to the matching closing brace.
+        body_lines = []
+        depth      = 0
+        in_func    = False
+        func_sig_re = re.compile(r'\badd_npc_to_point\b[^;]*\{')
+
+        for line in cpp_lines:
+            if not in_func:
+                if func_sig_re.search(line):
+                    in_func = True
+                    depth = line.count('{') - line.count('}')
+                    body_lines.append(line)
+            else:
+                body_lines.append(line)
+                depth += line.count('{') - line.count('}')
+                if depth == 0:
+                    break
+
+        check('add_npc_to_point function body located in citylife.cpp',
+              len(body_lines) > 0)
+
+        if body_lines:
+            body = ''.join(body_lines)
+            has_get_npc   = 'get_npc(' in body
+            has_null_guard = bool(re.search(r'if\s*\(\s*!\s*npc\s*\)', body) or
+                                  re.search(r'if\s*\(\s*npc\s*==\s*(NULL|nullptr)\s*\)', body))
+
+            check('add_npc_to_point calls get_npc()',
+                  has_get_npc)
+            check('add_npc_to_point has null guard after get_npc() '
+                  '-- missing guard crashes server when archetype is invalid',
+                  has_null_guard)
 
 except Exception as exc:
     print('\nFATAL: unhandled exception -- %s' % exc)
