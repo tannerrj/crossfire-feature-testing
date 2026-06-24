@@ -29,6 +29,7 @@ tests/
   test_citylife_config.py   NPC spawn config tests -- 52 checks
 .github/workflows/
   ci.yml                GitHub Actions: Python 3.8 through 3.12
+sample-test-output.md   Captured test run showing expected pass/fail results
 ```
 
 ## How the Mock Works

@@ -18,9 +18,9 @@ a temporary on-disk database, then cleans up after itself.
 | Message Boards | `CFBoard` | write, list, getauthor, delete by id, invalid delete, independent board namespaces |
 | Citylife / Player Log | `CFLog` | create, login count, IP tracking, kick and muzzle counters and dates, remove, timestamp parse |
 | Guild System | `CFGuilds` | guild registry (add, establish, points, quest points, status), member CRUD, full rank ladder, rank floor/ceiling, demerits cap, dues updating guild points, SearchGuilds |
-| Citylife NPC config | `fixtures/world.citylife` | parse correctness, required fields, zone/point bounds, archetype names, Scorn and Navar coverage, Scorn County fall-through |
+| Citylife NPC config | `fixtures/world.citylife` | parse correctness, required fields, zone/point bounds, archetype names, Scorn and Navar coverage, Scorn County fall-through, archetype cross-reference against arch library, server init order, null guard in `add_npc_to_point` |
 
-100 checks across the five Python subsystems; 52 checks for the citylife NPC configuration.
+100 checks across the five Python subsystems; 60 checks for the citylife NPC configuration. See `sample-test-output.md` for a captured run showing expected results.
 
 ## Requirements
 
@@ -56,12 +56,13 @@ crossfire-feature-testing/
 │   └── cfdatafile-putdata-fix.patch    Upstream bug fix patch
 ├── tests/
 │   ├── test_feature_systems.py         Python subsystem tests (100 checks)
-│   └── test_citylife_config.py         NPC spawn config tests (52 checks)
+│   └── test_citylife_config.py         NPC spawn config tests (60 checks)
 ├── .github/
 │   └── workflows/
 │       └── ci.yml          GitHub Actions: runs tests on Python 3.8 through 3.12
 ├── CLAUDE.md               Claude Code project context
 ├── README.md
+├── sample-test-output.md   Captured test run showing expected pass/fail results
 ├── LICENSE
 ├── requirements.txt
 └── .gitignore
