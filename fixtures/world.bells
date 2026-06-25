@@ -1,0 +1,18 @@
+# Scorn
+region scorn
+Devourers,Sorig,Ruggilli,Gaea,Mostrai,Lythander You hear the bell of the glorious temple of %god.
+Valriel,Gorokh You hear the bell of the glorious church of %god.
+* You hear the bells of the various temples of Scorn.
+
+# Darcap
+region darcap
+Devourers You hear the glorious bell of St. Andreas.
+Valkyrie You hear the bells of the glorious church of Valkyrie.
+* You hear the bells of St. Andreas and another church.
+
+# Navar
+region navar
+Gorokh,Ruggilli,Sorig,Valkyrie,Valriel You hear the bell of the glorious temple of %god.
+Mostrai You hear the bell of Mostrai's glorious cathedral.
+Gaea You hear the bell of Gaea's glorious shrine.
+* You hear the bells of the temples of Navar.

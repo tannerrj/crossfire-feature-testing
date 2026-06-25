@@ -19,8 +19,9 @@ a temporary on-disk database, then cleans up after itself.
 | Citylife / Player Log | `CFLog` | create, login count, IP tracking, kick and muzzle counters and dates, remove, timestamp parse |
 | Guild System | `CFGuilds` | guild registry (add, establish, points, quest points, status), member CRUD, full rank ladder, rank floor/ceiling, demerits cap, dues updating guild points, SearchGuilds |
 | Citylife NPC config | `fixtures/world.citylife` | parse correctness, required fields, zone/point bounds, archetype names, Scorn and Navar coverage, Scorn County fall-through, archetype cross-reference against arch library, server init order, null guard in `add_npc_to_point` |
+| City Bells config | `fixtures/world.bells` | parse correctness, region structure, fallback coverage, Scorn/Darcap/Navar god entries, message format (%god substitution), god name cross-reference against arch library, `cfcitybell_close()` clears wrong container (server bug), `.bells` hook registered after `load_assets()` (server bug) |
 
-100 checks across the five Python subsystems; 60 checks for the citylife NPC configuration. See `sample-test-output.md` for a captured run showing expected results.
+100 checks across the five Python subsystems; 60 checks for the citylife NPC configuration; 38 checks for the city bells configuration. See `sample-test-output.md` for a captured run showing expected results.
 
 ## Requirements
 
@@ -51,13 +52,15 @@ crossfire-feature-testing/
 │   ├── CFMail.py           Postal system
 │   └── CFSqlDb.py          SQLite database helper
 ├── fixtures/
-│   └── world.citylife          NPC spawn config (from crossfire-maps)
+│   ├── world.citylife          NPC spawn config (from crossfire-maps)
+│   └── world.bells             City bell region config (from crossfire-maps)
 ├── patches/
 │   ├── cfdatafile-putdata-fix.patch    Patch (unified diff, apply with patch -p1)
 │   └── cfdatafile-putdata-writeup.txt  Sourceforge bug report and write-up
 ├── tests/
 │   ├── test_feature_systems.py         Python subsystem tests (100 checks)
-│   └── test_citylife_config.py         NPC spawn config tests (60 checks)
+│   ├── test_citylife_config.py         NPC spawn config tests (60 checks)
+│   └── test_bells_config.py            City bell config tests (38 checks)
 ├── .github/
 │   └── workflows/
 │       └── ci.yml          GitHub Actions: runs tests on Python 3.8 through 3.12

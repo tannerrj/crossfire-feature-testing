@@ -24,9 +24,11 @@ lib/                    Crossfire Python modules under test (from crossfire-maps
   CFSqlDb.py            SQLite connection helper
 fixtures/
   world.citylife        NPC spawn configuration (from crossfire-maps)
+  world.bells           City bell region configuration (from crossfire-maps)
 tests/
   test_feature_systems.py   Python subsystem tests -- 100 checks
-  test_citylife_config.py   NPC spawn config tests -- 52 checks
+  test_citylife_config.py   NPC spawn config tests -- 60 checks
+  test_bells_config.py      City bell config tests -- 38 checks
 .github/workflows/
   ci.yml                GitHub Actions: Python 3.8 through 3.12
 sample-test-output.md   Captured test run showing expected pass/fail results
