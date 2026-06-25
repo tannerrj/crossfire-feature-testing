@@ -1,29 +1,14 @@
-*** a/python/CFDataFile.py
---- b/python/CFDataFile.py
-***************
-*** 76,88 ****
-              file = open(self.filename,'wt')
-          except:
-              raise Exception('Unable to open %s for writing' % self.datafile_name)
-          else:
-              header = dic['#']
-!             del dic['#']
-!             index = list(dic.keys())
-!             index.sort()
-              contents = '#|%s\n' %('|'.join(header))
-              file.write(contents)
-              for entry in index:
-                  tmp = []
-                  stringlist = dic[entry]
---- 76,86 ----
-              file = open(self.filename,'wt')
-          except:
-              raise Exception('Unable to open %s for writing' % self.datafile_name)
-          else:
-              header = dic['#']
-!             index = sorted(k for k in dic if k != '#')
-              contents = '#|%s\n' %('|'.join(header))
-              file.write(contents)
-              for entry in index:
-                  tmp = []
-                  stringlist = dic[entry]
+--- a/python/CFDataFile.py
++++ b/python/CFDataFile.py
+@@ -77,10 +77,8 @@ class CFDataFile:
+         except:
+             raise Exception('Unable to open %s for writing' % self.datafile_name)
+         else:
+             header = dic['#']
+-            del dic['#']
+-            index = list(dic.keys())
+-            index.sort()
++            index = sorted(k for k in dic if k != '#')
+             contents = '#|%s\n' %('|'.join(header))
+             file.write(contents)
+             for entry in index:

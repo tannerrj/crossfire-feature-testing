@@ -67,7 +67,9 @@ index = sorted(k for k in dic if k != '#')
 ```
 
 A patch has been submitted to the Crossfire project. See
-`patches/cfdatafile-putdata-fix.patch` in this repository.
+`patches/cfdatafile-putdata-fix.patch` (unified diff, patch -p1) and
+`patches/cfdatafile-putdata-writeup.txt` (Sourceforge bug report) in this
+repository.
 
 ## Upstream Source
 

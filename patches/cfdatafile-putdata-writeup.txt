@@ -1,0 +1,150 @@
+Summary: CFDataFile.putData destroys CFData instance on first write, causing
+         KeyError: '#' on any subsequent write through the same object
+
+Component: crossfire-maps
+File:      python/CFDataFile.py
+Function:  CFDataFile.putData()
+Severity:  Major (data write silently corrupts in-memory state; second write crashes)
+
+------------------------------------------------------------------------
+Description
+------------------------------------------------------------------------
+
+CFDataFile.putData() mutates the dictionary it is given rather than
+working from a read-only view of it. This corrupts the calling CFData
+instance after the first write, making it impossible to perform a second
+write through the same object without a crash.
+
+CFDataFile.putData() is always called with CFData.datadb as its argument:
+
+    self.datafile.putData(self.datadb)
+
+Python passes dicts by reference, so inside putData the parameter `dic`
+and the instance variable `self.datadb` refer to the same object. The
+function reads the column header from the '#' key and then deletes it
+to avoid writing it as a data row:
+
+    header = dic['#']
+    del dic['#']           # <-- modifies self.datadb in-place
+    index = list(dic.keys())
+    index.sort()
+
+After this runs, self.datadb no longer contains the '#' key. The write
+to disk completes correctly, but the in-memory object is permanently
+damaged. Any subsequent call to put_record(), remove_record(), or any
+other method that calls putData() will reach:
+
+    header = dic['#']      # KeyError: '#'
+
+and crash.
+
+------------------------------------------------------------------------
+Who is affected
+------------------------------------------------------------------------
+
+Any code that holds a CFData-backed object (CFGuild, CFGuildHouses,
+CFLog) across more than one write call. CFGuild has approximately a
+dozen write methods (add_member, promote_member, demote_member,
+add_demerits, remove_demerits, pay_dues, change_status, etc.) and it
+is natural to call several of them in sequence on the same object.
+
+------------------------------------------------------------------------
+Why it went undetected
+------------------------------------------------------------------------
+
+Crossfire map scripts typically create a fresh CFData-backed object for
+each player event, perform exactly one write, and then exit. The
+corruption of self.datadb happens inside that single write call, but
+nothing ever reads the damaged object before it goes out of scope. The
+file on disk is always written correctly. The bug is only exposed when
+an object is reused for a second write within the same Python execution
+context.
+
+------------------------------------------------------------------------
+Steps to reproduce
+------------------------------------------------------------------------
+
+    from CFDataFile import CFData
+
+    db = CFData('test_log', ['Field1', 'Field2'])
+
+    # First write succeeds
+    db.put_record({'#': 'Alice', 'Field1': 'a', 'Field2': 'b'})
+
+    # Second write crashes: KeyError: '#'
+    db.put_record({'#': 'Bob', 'Field1': 'c', 'Field2': 'd'})
+
+------------------------------------------------------------------------
+Root cause
+------------------------------------------------------------------------
+
+putData() needs a list of data-row keys (everything except '#') to
+iterate over when writing rows. The original implementation obtained
+this list by deleting '#' from the dict and then calling dict.keys().
+The deletion modifies the caller's dict permanently.
+
+------------------------------------------------------------------------
+Fix
+------------------------------------------------------------------------
+
+Build the key list without modifying the dict. Replace:
+
+    del dic['#']
+    index = list(dic.keys())
+    index.sort()
+
+with:
+
+    index = sorted(k for k in dic if k != '#')
+
+The generator expression iterates over dic without touching it. The '#'
+key is excluded by the condition; sorted() returns a new list in
+ascending order. dic (and therefore CFData.datadb) is left unchanged,
+and subsequent write calls work correctly.
+
+A unified diff patch is attached (apply with: patch -p1 < patch_file).
+
+------------------------------------------------------------------------
+Also noted: put_record() mutates its argument
+------------------------------------------------------------------------
+
+CFData.put_record() contains a similar in-place deletion:
+
+    name = record['#']
+    del record['#']        # mutates the caller's dict
+
+This deletes the '#' key from the record dict passed in by the caller.
+Scripts that reuse record dicts across multiple put_record() calls will
+find the '#' key missing on the second call. The fix follows the same
+pattern -- read name from record['#'] without deleting it:
+
+    name = record['#']
+    # remove del record['#'] -- read fields by name instead:
+    temp = [record[item] for item in self.header]
+    self.datadb[name] = temp
+    self.datafile.putData(self.datadb)
+
+This is a separate change and is not included in the attached patch.
+
+------------------------------------------------------------------------
+Patch
+------------------------------------------------------------------------
+
+Apply from the root of the crossfire-maps checkout:
+
+    patch -p1 < cfdatafile-putdata-fix.patch
+
+--- a/python/CFDataFile.py
++++ b/python/CFDataFile.py
+@@ -77,10 +77,8 @@ class CFDataFile:
+         except:
+             raise Exception('Unable to open %s for writing' % self.datafile_name)
+         else:
+             header = dic['#']
+-            del dic['#']
+-            index = list(dic.keys())
+-            index.sort()
++            index = sorted(k for k in dic if k != '#')
+             contents = '#|%s\n' %('|'.join(header))
+             file.write(contents)
+             for entry in index:

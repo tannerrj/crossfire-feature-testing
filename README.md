@@ -53,7 +53,8 @@ crossfire-feature-testing/
 ├── fixtures/
 │   └── world.citylife          NPC spawn config (from crossfire-maps)
 ├── patches/
-│   └── cfdatafile-putdata-fix.patch    Upstream bug fix patch
+│   ├── cfdatafile-putdata-fix.patch    Patch (unified diff, apply with patch -p1)
+│   └── cfdatafile-putdata-writeup.txt  Sourceforge bug report and write-up
 ├── tests/
 │   ├── test_feature_systems.py         Python subsystem tests (100 checks)
 │   └── test_citylife_config.py         NPC spawn config tests (60 checks)
