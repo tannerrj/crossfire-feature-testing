@@ -1,0 +1,11 @@
+--- a/server/modules/cfcitybell.cpp
++++ b/server/modules/cfcitybell.cpp
+@@ -171,7 +171,7 @@ void cfcitybell_close() {
+     for (const auto& reg : regions) {
+         delete reg.second;
+     }
+-    all_regions.clear();
++    regions.clear();
+ }
+
+ /*@}*/
