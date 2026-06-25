@@ -31,6 +31,10 @@ tests/
   test_bells_config.py      City bell config tests -- 38 checks
 .github/workflows/
   ci.yml                GitHub Actions: Python 3.8 through 3.12
+patches/
+  cfdatafile-putdata-fix.patch      crossfire-maps patch (unified diff, patch -p1)
+  cfdatafile-putdata-writeup.txt    Sourceforge bug report and write-up
+  cfcitybell-close-fix.patch        crossfire-server patch (unified diff, patch -p1)
 sample-test-output.md   Captured test run showing expected pass/fail results
 ```
 
@@ -72,6 +76,15 @@ A patch has been submitted to the Crossfire project. See
 `patches/cfdatafile-putdata-fix.patch` (unified diff, patch -p1) and
 `patches/cfdatafile-putdata-writeup.txt` (Sourceforge bug report) in this
 repository.
+
+## Server Bug Patch: cfcitybell_close()
+
+`cfcitybell_close()` calls `all_regions.clear()` instead of `regions.clear()`,
+wiping the server-wide game region list on module shutdown. Three other server
+bugs found by the test suites were fixed upstream (commits 03ec12549,
+f0d97962c, cb3923edd). This one remains open. See
+`patches/cfcitybell-close-fix.patch` (unified diff, patch -p1 from the
+crossfire-server root).
 
 ## Upstream Source
 

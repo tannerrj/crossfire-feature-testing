@@ -34,10 +34,13 @@ From the project root directory:
 
 ```
 python3 tests/test_feature_systems.py
+python3 tests/test_citylife_config.py
+python3 tests/test_bells_config.py
 ```
 
-Exit code `0` means all tests passed. Exit code `1` means one or more checks
-failed; the summary printed at the end lists every failure by description.
+Each test suite is independent and can be run individually. Exit code `0`
+means all checks passed. Exit code `1` means one or more checks failed;
+the summary printed at the end lists every failure by description.
 
 ## Project Structure
 
@@ -55,8 +58,9 @@ crossfire-feature-testing/
 │   ├── world.citylife          NPC spawn config (from crossfire-maps)
 │   └── world.bells             City bell region config (from crossfire-maps)
 ├── patches/
-│   ├── cfdatafile-putdata-fix.patch    Patch (unified diff, apply with patch -p1)
-│   └── cfdatafile-putdata-writeup.txt  Sourceforge bug report and write-up
+│   ├── cfdatafile-putdata-fix.patch    crossfire-maps patch (unified diff, patch -p1)
+│   ├── cfdatafile-putdata-writeup.txt  Sourceforge bug report and write-up
+│   └── cfcitybell-close-fix.patch      crossfire-server patch (unified diff, patch -p1)
 ├── tests/
 │   ├── test_feature_systems.py         Python subsystem tests (100 checks)
 │   ├── test_citylife_config.py         NPC spawn config tests (60 checks)
@@ -115,6 +119,24 @@ index = sorted(k for k in dic if k != '#')
 
 A patch for the upstream repository has been submitted to the Crossfire
 project. See [`patches/cfdatafile-putdata-fix.patch`](patches/cfdatafile-putdata-fix.patch).
+
+## Server Bugs Found and Patched
+
+Running the test suites against the live server source identified several
+bugs in `crossfire-server`. Three were fixed upstream in commit `03ec12549`
+(init order via `StartupStage`), `f0d97962c` (null guard in
+`add_npc_to_point`), and `cb3923edd` (`object_free` flags). One remains
+unfixed:
+
+**`cfcitybell_close()` clears the wrong container** —
+`cfcitybell_close()` frees each `Region` object in the module's `regions`
+map and then calls `all_regions.clear()`. `all_regions` is the server-wide
+game region list (`common/region.cpp`), not the module's map. Clearing it
+on module shutdown destroys all region data in memory for the remainder of
+the server process. The correct call is `regions.clear()`.
+
+A patch is in [`patches/cfcitybell-close-fix.patch`](patches/cfcitybell-close-fix.patch)
+(unified diff, apply with `patch -p1` from the crossfire-server root).
 
 ## Upstream Relationship
 
