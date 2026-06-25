@@ -21,7 +21,7 @@ a temporary on-disk database, then cleans up after itself.
 | Citylife NPC config | `fixtures/world.citylife` | parse correctness, required fields, zone/point bounds, archetype names, Scorn and Navar coverage, Scorn County fall-through, archetype cross-reference against arch library, server init order, null guard in `add_npc_to_point` |
 | City Bells config | `fixtures/world.bells` | parse correctness, region structure, fallback coverage, Scorn/Darcap/Navar god entries, message format (%god substitution), god name cross-reference against arch library, `cfcitybell_close()` clears wrong container (server bug), `.bells` hook registered after `load_assets()` (server bug) |
 
-100 checks across the five Python subsystems; 60 checks for the citylife NPC configuration; 38 checks for the city bells configuration. See `sample-test-output.md` for a captured run showing expected results.
+198 checks across three test suites: 100 for the five Python subsystems, 60 for the citylife NPC configuration, and 38 for the city bells configuration. See `sample-test-output.md` for a captured run showing expected results.
 
 ## Requirements
 
