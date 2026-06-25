@@ -1,14 +1,11 @@
 # Sample Test Output
 
-Output from running both test suites against the Crossfire feature testing
-project. Captured 2026-06-24 on Python 3.13.
+Output from running all three test suites against the Crossfire feature testing
+project. Captured 2026-06-25 on Python 3.13.
 
-The two `FAIL` results at the end of `test_citylife_config.py` are
-**intentional** — they confirm two known bugs in the current Crossfire server
-codebase (see commit message for `f3d0a46` for details). They are not errors
-in the test suite.
-
----
+The `FAIL` results in `test_citylife_config.py` and `test_bells_config.py` are
+**intentional** — they confirm known bugs in the current Crossfire server
+codebase. They are not errors in the test suite.
 
 ```
 $ python3 tests/test_feature_systems.py
@@ -219,4 +216,68 @@ Results: 58 passed, 2 failed out of 60
 Failed:
   - init_modules() (line 1147) is called before init_library() (line 1128) -- if reversed, citylife hook is registered too late and no NPCs spawn
   - add_npc_to_point has null guard after get_npc() -- missing guard crashes server when archetype is invalid
+
+$ python3 tests/test_bells_config.py
+
+--- File and parser ---
+  PASS  fixtures/world.bells exists
+  PASS  file parses without errors
+  PASS  3 regions parsed (scorn, darcap, navar)
+
+--- Required fields (all regions) ---
+  PASS  all regions have at least one god-specific entry
+  PASS  all regions have a fallback (*) entry
+  PASS  all god-specific messages are non-empty
+  PASS  all fallback messages are non-empty
+
+--- Message format ---
+  PASS  all god names are non-empty and contain no whitespace
+  PASS  no unrecognized % sequences in messages (only %god is valid)
+
+--- Scorn region coverage ---
+  PASS  scorn region defined
+  PASS  scorn has entry for Devourers
+  PASS  scorn has entry for Sorig
+  PASS  scorn has entry for Ruggilli
+  PASS  scorn has entry for Gaea
+  PASS  scorn has entry for Mostrai
+  PASS  scorn has entry for Lythander
+  PASS  scorn has entry for Valriel
+  PASS  scorn has entry for Gorokh
+  PASS  scorn has fallback message
+
+--- Darcap region coverage ---
+  PASS  darcap region defined
+  PASS  darcap has entry for Devourers
+  PASS  darcap has entry for Valkyrie
+  PASS  darcap has fallback message
+
+--- Navar region coverage ---
+  PASS  navar region defined
+  PASS  navar has entry for Gorokh
+  PASS  navar has entry for Ruggilli
+  PASS  navar has entry for Sorig
+  PASS  navar has entry for Valkyrie
+  PASS  navar has entry for Valriel
+  PASS  navar has entry for Mostrai
+  PASS  navar has entry for Gaea
+  PASS  navar has fallback message
+
+--- God archetype cross-reference ---
+  PASS  arch library loaded (11 god archetypes found)
+  PASS  all 9 god names in world.bells match a type-50 archetype
+
+--- Bug A: cfcitybell_close() clears wrong container (server bug) ---
+  PASS  cfcitybell_close() function body found in cfcitybell.cpp
+  FAIL  cfcitybell_close() calls regions.clear() not all_regions.clear() -- calling all_regions.clear() destroys all server region data
+
+--- Bug B: .bells hook registered after load_assets() (server bug) ---
+  PASS  add_server_collect_hooks() body found in server/init.cpp
+  FAIL  .bells hook registered in add_server_collect_hooks() before init_library() -- if absent, no .bells files are ever loaded
+
+==================================================
+Results: 36 passed, 2 failed out of 38
+Failed:
+  - cfcitybell_close() calls regions.clear() not all_regions.clear() -- calling all_regions.clear() destroys all server region data
+  - .bells hook registered in add_server_collect_hooks() before init_library() -- if absent, no .bells files are ever loaded
 ```
