@@ -117,8 +117,9 @@ header = dic['#']
 index = sorted(k for k in dic if k != '#')
 ```
 
-A patch for the upstream repository has been submitted to the Crossfire
-project. See [`patches/cfdatafile-putdata-fix.patch`](patches/cfdatafile-putdata-fix.patch).
+A patch for the upstream repository was submitted and accepted. The fix is
+now present in the upstream crossfire-maps source. See
+[`patches/cfdatafile-putdata-fix.patch`](patches/cfdatafile-putdata-fix.patch).
 
 ## Server Bugs Found and Patched
 
