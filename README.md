@@ -19,7 +19,7 @@ a temporary on-disk database, then cleans up after itself.
 | Citylife / Player Log | `CFLog` | create, login count, IP tracking, kick and muzzle counters and dates, remove, timestamp parse |
 | Guild System | `CFGuilds` | guild registry (add, establish, points, quest points, status), member CRUD, full rank ladder, rank floor/ceiling, demerits cap, dues updating guild points, SearchGuilds |
 | Citylife NPC config | `fixtures/world.citylife` | parse correctness, required fields, zone/point bounds, archetype names, Scorn and Navar coverage, Scorn County fall-through, archetype cross-reference against arch library, server init order, null guard in `add_npc_to_point` |
-| City Bells config | `fixtures/world.bells` | parse correctness, region structure, fallback coverage, Scorn/Darcap/Navar god entries, message format (%god substitution), god name cross-reference against arch library, `cfcitybell_close()` clears wrong container (server bug), `.bells` hook registered after `load_assets()` (server bug) |
+| City Bells config | `fixtures/world.bells` | parse correctness, region structure, fallback coverage, Scorn/Darcap/Navar god entries, message format (%god substitution), god name cross-reference against arch library, `cfcitybell_close()` clears wrong container (server bug), `StartupStage` mechanism ensures `.bells` hook registered before `load_assets()` |
 
 198 checks across three test suites: 100 for the five Python subsystems, 60 for the citylife NPC configuration, and 38 for the city bells configuration. See `sample-test-output.md` for a captured run showing expected results.
 

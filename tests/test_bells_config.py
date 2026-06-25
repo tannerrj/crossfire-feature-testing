@@ -7,16 +7,19 @@ module (server/modules/cfcitybell.cpp: load_bells()) and checks that every
 region entry is internally consistent, covers all expected gods, and uses
 valid god archetype names.
 
-Also checks two confirmed server bugs against the server source:
+Also checks two server bugs against the server source:
 
   Bug A -- cfcitybell_close() calls all_regions.clear() instead of
            regions.clear(), wiping the server's entire region list on module
            shutdown.  Expected result: FAIL (unfixed upstream).
 
-  Bug B -- The .bells collector hook is registered in cfcitybell_init(),
-           which is called from init_modules(), which runs after
-           init_library() (and therefore after load_assets()).  No .bells
-           files are ever loaded.  Expected result: FAIL (unfixed upstream).
+  Bug B -- The .bells collector hook was registered in cfcitybell_init(),
+           which ran after init_library()/load_assets(), so no .bells files
+           were ever loaded.  Fixed upstream (commit 03ec12549) by introducing
+           a StartupStage enum: add_server_collect_hooks() now calls
+           init_modules(STARTUP_STAGE_COLLECT_HOOKS) before init_library(),
+           and cfcitybell_init() registers the .bells hook only at that stage.
+           Expected result: PASS (fixed upstream).
 
 No running Crossfire server is required.
 
@@ -333,21 +336,22 @@ try:
                   'regions.clear()' in body and 'all_regions.clear()' not in body)
 
     # -----------------------------------------------------------------------
-    # Bug B: .bells hook registered after load_assets() (server bug)
+    # Bug B: .bells hook registered before load_assets() (server bug, fixed)
     #
-    # cfcitybell_init() calls assets_add_collector_hook(".bells", load_bells).
-    # cfcitybell_init() is called from init_modules(), which runs after
-    # init_library() (and therefore after load_assets()).  The hook fires too
-    # late and no .bells files are ever loaded, so no bell messages are
-    # configured and no bells ever ring.
+    # Original bug: cfcitybell_init() called assets_add_collector_hook(".bells",
+    # load_bells) but ran from init_modules() after init_library()/load_assets(),
+    # so no .bells files were ever loaded.
     #
-    # The fix is to register the .bells hook in add_server_collect_hooks()
-    # (in server/init.cpp), alongside /materials and /races, before
-    # init_library() is called.
+    # Fix (commit 03ec12549): a StartupStage enum was introduced.
+    # add_server_collect_hooks() now calls init_modules(STARTUP_STAGE_COLLECT_HOOKS)
+    # before init_library() is called.  cfcitybell_init() registers the .bells
+    # hook only when stage == STARTUP_STAGE_COLLECT_HOOKS, so it now fires at
+    # the correct time.
     #
-    # Expected result: FAIL (unfixed in upstream server source).
+    # Check: init_modules() is called inside add_server_collect_hooks(), which
+    # proves the STARTUP_STAGE_COLLECT_HOOKS pass runs before load_assets().
     # -----------------------------------------------------------------------
-    section('Bug B: .bells hook registered after load_assets() (server bug)')
+    section('Bug B: .bells hook registered before load_assets() (server bug)')
 
     if not os.path.isfile(INIT_CPP):
         print('  SKIP  server/init.cpp not found at %s' % INIT_CPP)
@@ -377,9 +381,10 @@ try:
 
         if hook_body:
             body = ''.join(hook_body)
-            check('.bells hook registered in add_server_collect_hooks() before '
-                  'init_library() -- if absent, no .bells files are ever loaded',
-                  '".bells"' in body or "'.bells'" in body or '.bells' in body)
+            check('init_modules() called inside add_server_collect_hooks() '
+                  '-- ensures STARTUP_STAGE_COLLECT_HOOKS runs before load_assets(), '
+                  'so .bells hook is registered in time',
+                  'init_modules' in body)
 
 except Exception as exc:
     print('\nFATAL: unhandled exception -- %s' % exc)

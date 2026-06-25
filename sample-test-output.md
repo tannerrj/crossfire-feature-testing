@@ -3,9 +3,10 @@
 Output from running all three test suites against the Crossfire feature testing
 project. Captured 2026-06-25 on Python 3.13.
 
-The `FAIL` results in `test_citylife_config.py` and `test_bells_config.py` are
-**intentional** — they confirm known bugs in the current Crossfire server
-codebase. They are not errors in the test suite.
+The one `FAIL` in `test_bells_config.py` is **intentional** — it confirms a
+known unfixed bug in the current Crossfire server codebase (`cfcitybell_close()`
+calls `all_regions.clear()` instead of `regions.clear()`). It is not an error
+in the test suite.
 
 ```
 $ python3 tests/test_feature_systems.py
@@ -204,18 +205,15 @@ $ python3 tests/test_citylife_config.py
 --- Server init order (Bug 1: init_modules before init_library) ---
   PASS  init_modules() call found in server/init.cpp
   PASS  init_library() call found in server/init.cpp
-  FAIL  init_modules() (line 1147) is called before init_library() (line 1128) -- if reversed, citylife hook is registered too late and no NPCs spawn
+  PASS  init_modules() (line 1095) is called before init_library() (line 1133) -- if reversed, citylife hook is registered too late and no NPCs spawn
 
 --- Null guard in add_npc_to_point (Bug 2: latent null dereference) ---
   PASS  add_npc_to_point function body located in citylife.cpp
   PASS  add_npc_to_point calls get_npc()
-  FAIL  add_npc_to_point has null guard after get_npc() -- missing guard crashes server when archetype is invalid
+  PASS  add_npc_to_point has null guard after get_npc() -- missing guard crashes server when archetype is invalid
 
 ==================================================
-Results: 58 passed, 2 failed out of 60
-Failed:
-  - init_modules() (line 1147) is called before init_library() (line 1128) -- if reversed, citylife hook is registered too late and no NPCs spawn
-  - add_npc_to_point has null guard after get_npc() -- missing guard crashes server when archetype is invalid
+Results: 60 passed, 0 failed out of 60
 
 $ python3 tests/test_bells_config.py
 
@@ -271,13 +269,12 @@ $ python3 tests/test_bells_config.py
   PASS  cfcitybell_close() function body found in cfcitybell.cpp
   FAIL  cfcitybell_close() calls regions.clear() not all_regions.clear() -- calling all_regions.clear() destroys all server region data
 
---- Bug B: .bells hook registered after load_assets() (server bug) ---
+--- Bug B: .bells hook registered before load_assets() (server bug) ---
   PASS  add_server_collect_hooks() body found in server/init.cpp
-  FAIL  .bells hook registered in add_server_collect_hooks() before init_library() -- if absent, no .bells files are ever loaded
+  PASS  init_modules() called inside add_server_collect_hooks() -- ensures STARTUP_STAGE_COLLECT_HOOKS runs before load_assets(), so .bells hook is registered in time
 
 ==================================================
-Results: 36 passed, 2 failed out of 38
+Results: 37 passed, 1 failed out of 38
 Failed:
   - cfcitybell_close() calls regions.clear() not all_regions.clear() -- calling all_regions.clear() destroys all server region data
-  - .bells hook registered in add_server_collect_hooks() before init_library() -- if absent, no .bells files are ever loaded
 ```
